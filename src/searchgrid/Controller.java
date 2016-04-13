@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Queue;
+import javax.swing.ImageIcon;
 import javax.swing.Timer;
 
 /**
@@ -32,6 +33,8 @@ public class Controller implements ActionListener{
     boolean goingRight;
     boolean goingUp;
     boolean goingDown;
+    
+    boolean clockwise;
     
     boolean gettingSmaller = false;
     
@@ -64,11 +67,11 @@ public class Controller implements ActionListener{
         
         setStart(start,start);
         setEnd(panel.size-start,panel.size - start);
-        createWalls();
+        //createWalls();
         hookUpButtons();
         timer = new Timer(100, this);
         timer.start();
-        System.out.println("there are " + smoothPoints.size() + " smooth points");
+       // System.out.println("there are " + smoothPoints.size() + " smooth points");
     }
     
     
@@ -126,8 +129,14 @@ public class Controller implements ActionListener{
       
       private void checkY(){
         if(goingLeft && checkForWall(sx+1,sy)){
-           sy--; 
+          
+            if(!checkForWall(sx,sy-1)){
+               sy--;  
+            }
+            
         }else{
+            
+            
             
          // go right   
        if(sy < ey){
@@ -141,7 +150,7 @@ public class Controller implements ActionListener{
                 goingLeft = false;
                 }
            } 
-       }
+       }// end go right
        
        
        
@@ -194,10 +203,12 @@ public class Controller implements ActionListener{
    
       private void nextStep2(int a, int b){
        
-          
+          String ekename = "images/bigskull.gif"; 
+        ImageIcon onkeyPic = new ImageIcon(ekename);
+        panel.main.zeke.setIcon(onkeyPic);
         //smoothPoints.get(0);
           
-         System.out.println("there are " + smoothPoints.size() + " smooth points");  
+        // System.out.println("there are " + smoothPoints.size() + " smooth points");  
           
           
           
@@ -232,24 +243,15 @@ public class Controller implements ActionListener{
                                 
                 }else{
                   
-                          
-             for(int i = 0; i < path.size(); i++){
-           
          
-           
-       
-                    panel.grid[ path.get(i).j][ path.get(i).g].setBackground(java.awt.Color.green);
-                    panel.grid[ path.get(i).j][ path.get(i).g].setForeground(java.awt.Color.green);
-   
-             }
       
-      
-                    
+                    colorPath();
               
                     
                     
-                    System.out.println("steps to target including pathfinding: " + counter);
+                    panel.main.label.setText("steps to find shortest path: " + counter);
                       timer.stop();
+                      panel.main.start.setText("new"); 
                 }
              
         
@@ -257,7 +259,34 @@ public class Controller implements ActionListener{
        
    } // end next step  
    
+ private void colorPath(){
+     
+                      
+             for(int i = 0; i < path.size(); i++){
+           
+         
+           if(i%2==0){
+                 panel.grid[ path.get(i).j][ path.get(i).g].setBackground(java.awt.Color.green);
+                    panel.grid[ path.get(i).j][ path.get(i).g].setForeground(java.awt.Color.green); 
+           }else{
+           String zekename = "images/zeke.gif"; 
+        ImageIcon monkeyPic = new ImageIcon(zekename);
+        //panel.grid[ path.get(i).j][ path.get(i).g].setIcon(monkeyPic);
+          String kenam = "images/bigzeke.gif"; 
+        ImageIcon onkyPic = new ImageIcon(kenam);
+       // panel.main.zeke.setIcon(onkyPic);
+              panel.grid[ path.get(i).j][ path.get(i).g].setBackground(java.awt.Color.white);
+                    panel.grid[ path.get(i).j][ path.get(i).g].setForeground(java.awt.Color.white);
+           
+           }
+       
+                 
    
+             }
+      
+     
+     
+ }  
    
    
   private boolean checkForWall(int a, int b){
@@ -273,6 +302,10 @@ public class Controller implements ActionListener{
   } 
    
   private void createWalls(){
+      /*
+      
+      these are the original walls, leaving them here for reference.  
+      
       
       addWall(10,10);
       addWall(11,10);
@@ -288,12 +321,19 @@ public class Controller implements ActionListener{
       addWall(14,9);
       
       
+      addWall(19,4);
       addWall(19,5);
-      //addWall(19,6);
+      addWall(19,6);
      // addWall(19,7);
     //  addWall(19,8);
      // addWall(19,9);
       
+      //addWall(18,10);
+     // addWall(18,10);
+     // addWall(18,10);
+     // addWall(18,10);
+     
+     
       addWall(23,20);
       addWall(24,20);
       addWall(25,20);
@@ -322,7 +362,7 @@ public class Controller implements ActionListener{
       addWall(28,19);
       addWall(28,20);
       
-      
+      */
   }
   
   private void printPath(){
@@ -345,59 +385,25 @@ public class Controller implements ActionListener{
       
       
   } 
-  
-  private void hookUpButtons(){
-      
-          
-             for(int i = 0; i < panel.size; i++){
-           
-          for(int j = 0; j < panel.size; j++){
-           
-       
-     panel.grid[i][j].addActionListener(this);
-       
-          }
-             }
-      
-      
-      
-      
-  }
-  
-  
-  
-  
-    @Override
-    public void actionPerformed(ActionEvent e) {
+
+    private void hookUpButtons() {
+
+        for (int i = 0; i < panel.size; i++) {
+
+            for (int j = 0; j < panel.size; j++) {
+
+                panel.grid[i][j].addActionListener(this);
+
+            }
+        }
+
+        panel.main.start.addActionListener(this);
+        panel.main.zeke.addActionListener(this);
         
-        
-       if (e.getSource() == timer){
-           counter++;
-           
-           if(lenny){
-           nextStep(sx,sy);
-           }else{
-            nextStep2(sx,sy);   
-           }
-           
-           
-       }
-       
-             for(int i = 0; i < panel.size; i++){
-           
-          for(int j = 0; j < panel.size; j++){
-           
-       
-       if (e.getSource() == panel.grid[i][j]){
-           
-           System.out.println("THAT CLICK WAS   position = [" + i + "][" + j + "]");
-       }
-       
-          }
-             }
-           
-       
-    } // end action listener
+    }
+
+  
+  
     
     private void smooth(int start){
         // start at start, and then get distance 1-2, 1-3, etc
@@ -405,7 +411,7 @@ public class Controller implements ActionListener{
         
         
         for(int i = start+ 1; i < path.size();i++){
-            System.out.println("\nSMOOTHING...  step #"+ i  + ", " + getDistance(path.get(start).j,path.get(i).j, path.get(start).g,path.get(i).g));
+           // System.out.println("\nSMOOTHING...  step #"+ i  + ", " + getDistance(path.get(start).j,path.get(i).j, path.get(start).g,path.get(i).g));
           if(getDistance(path.get(start).j,path.get(i).j, path.get(start).g,path.get(i).g)  < getDistance(path.get(start).j,path.get(i-1).j, path.get(start).g,path.get(i-1).g)){
               panel.grid[path.get(i).j][path.get(i).g].setBackground(java.awt.Color.MAGENTA);
               gettingSmaller = true;
@@ -414,7 +420,7 @@ public class Controller implements ActionListener{
               
               if(gettingSmaller){
                   smoothPoints.add(path.get(i-1));
-                   System.out.println("there are " + smoothPoints.size() + " smooth points");//System.out.println("\n\n\n this is a SUUUUUUPER POINT!!!!!!!!!!!!   [" + path.get(i-1).j+ "][" + path.get(i-1).g + "]\n\n\n");
+                //   System.out.println("there are " + smoothPoints.size() + " smooth points");//System.out.println("\n\n\n this is a SUUUUUUPER POINT!!!!!!!!!!!!   [" + path.get(i-1).j+ "][" + path.get(i-1).g + "]\n\n\n");
                 nextSmoothPoint = i-1;
                 gettingSmaller = false;
               return;
@@ -433,12 +439,82 @@ public class Controller implements ActionListener{
     
  private double getDistance(int a, int a2, int b, int b2){
      double temp = Math.sqrt(((a2-a)*(a2-a))+((b2-b)*(b2-b)));
-    System.out.println("distance from = [" + a + "][" + b + "] to [" + a2 + "][" + b2+ "] is " + temp);
+  //  System.out.println("distance from = [" + a + "][" + b + "] to [" + a2 + "][" + b2+ "] is " + temp);
    return temp;
      
      
      
      
- }   
-    
+ }   // end get distance
+  
+ 
+ 
+  
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        
+        
+       if (e.getSource() == timer){
+           counter++;
+           
+           if(lenny){
+           nextStep(sx,sy);
+           }else{
+            nextStep2(sx,sy);   
+           }
+           
+           
+       }
+       
+       
+             if (e.getSource() ==  panel.main.start){
+      
+                 if(panel.main.start.getText().endsWith("new")){
+                   //panel.main.runSearch();
+                 }else if(panel.main.start.getText().endsWith("start")){
+                   panel.main.start.setText("pause");  
+                   timer.start();
+                 }else{
+                    panel.main.start.setText("start"); 
+                    timer.stop();
+                 }
+                 
+                 
+                 
+                 
+               }
+       
+      
+       
+       
+       
+       
+        for (int i = 0; i < panel.size; i++) {
+
+            for (int j = 0; j < panel.size; j++) {
+
+                if (e.getSource() == panel.grid[i][j]) {
+
+                    if (panel.grid[i][j].getBackground().equals(java.awt.Color.white)) {
+                        panel.grid[i][j].setBackground(java.awt.Color.black);
+                        panel.map[i][j]=1;
+                        panel.writeMap();
+                    } else {
+                        panel.grid[i][j].setBackground(java.awt.Color.white);
+                         panel.map[i][j]=0;
+                         panel.writeMap();
+                    }
+
+                    //System.out.println("position = [" + i + "][" + j + "]");
+                }
+
+            }  // end for j
+        } // end for i
+           
+       
+    } // end action listener
+ 
+ 
+ 
+ 
 } // end class

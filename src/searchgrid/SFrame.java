@@ -12,8 +12,8 @@ import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 public class SFrame extends JFrame{
     
-  SPanel panel = new SPanel();
-
+    //SPanel panel = new SPanel();
+    MainPanel main = new MainPanel();
     public SFrame(){
         
     
@@ -21,7 +21,7 @@ public class SFrame extends JFrame{
         super("ZStar search algorithm - written at Shingletown Gap 04/12/16");
         
        setLayout(new BorderLayout());
-        getContentPane().add(panel);
+        getContentPane().add(main);
         
         setSize(1000, 1000);
         setVisible(true);
