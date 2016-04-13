@@ -425,9 +425,9 @@ public class Controller implements ActionListener{
               
           }  
         }
-       // when distance < step, mark step as bad
+       // when distance > step, mark step as bad
         // when distance is back to normal,
-        //try to draw a line to the last bad step
+        //try to draw a line to the last bad step 
         
     }
     
