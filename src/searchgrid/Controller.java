@@ -24,9 +24,10 @@ public class Controller implements ActionListener{
     SPanel panel;
     Timer timer;
     
-    int start = 3;
-    
-    
+    int startx;// = panel.size-3;
+    int starty;// = 3;
+    int endx;// = 3;
+    int endy;// = panel.size-3;
     int sx;
     int sy;
     int ex;
@@ -55,8 +56,11 @@ public class Controller implements ActionListener{
     
     public Controller(SPanel s){
         
-       panel = s;
-       
+        panel = s;
+        startx = 3;//panel.size - 3;
+        starty = 3;
+        endx = panel.size - 3;
+        endy = panel.size - 3;
        
        setup();
        
@@ -68,8 +72,8 @@ public class Controller implements ActionListener{
     
     private void setup(){
         
-        setStart(start,start);
-        setEnd(panel.size-start,panel.size - start);
+        setStart(startx,starty);//setStart(start,start);//
+        setEnd(endx, endy);//setEnd(panel.size-start,panel.size - start);//
         //createWalls();
         hookUpButtons();
         timer = new Timer(100, this);
@@ -101,13 +105,41 @@ public class Controller implements ActionListener{
       
       
       
+      
+      
+      
+      
+      
+        ////////////////////////////////////////////////////////////////////////////////  
+    ////////////////////////////////////////////////////////////////////////  
+   ////////////////////////////////////////////////////////////////////////////////   
+          ////////////////////////////////////////////////////////////////////////////////  
+    ////////////////////////////////////////////////////////////////////////  
+   ////////////////////////////////////////////////////////////////////////////////   
+      
+      
+      
+      
       private void checkX(){
           
+          if(goingDown && checkForWall(sx,sy+1) || checkForWall(sx,sy-1)){
+                  if(!checkForWall(sx-1,sy)){
+               sx--;  
+            }else{
+                if(checkForWall(sx,sy+1)){
+                    sy--;
+                }else{
+                    sy++;
+                }
+            }
+          }else{
           // go down
             if(sx < ex){
                 if(!checkForWall(sx+1,sy)){
                     sx++; 
                     //goingLeft = true;  
+                }else{
+                    goingLeft = true;   
                 }
                 
                  // special condition for when there is a wall below you and the taget is directly beneath you, otherwise you will stop moving
@@ -118,6 +150,13 @@ public class Controller implements ActionListener{
                 
             }  // end go down
             
+            
+             ////////////////////////////////////////////////////////////////////////////////  
+    ////////////////////////////////////////////////////////////////////////  
+   ////////////////////////////////////////////////////////////////////////////////      
+   
+   
+   
         // go up    
        if(sx > ex){
           if(!checkForWall(sx-1,sy)){
@@ -125,16 +164,39 @@ public class Controller implements ActionListener{
            }
        }  // end go up
        
-    
-       
+             // special condition for when there is a wall below you and the taget is directly beneath you, otherwise you will stop moving
+        if(checkForWall(sx-1,sy) && sy == ey){
+                   goingLeft = true;  
+                }  
+                
+          }
       } // end check x
       
       
+      
+      
+      
+      
+         ////////////////////////////////////////////////////////////////////////////////  
+    ////////////////////////////////////////////////////////////////////////  
+   ////////////////////////////////////////////////////////////////////////////////    
+      
+      
+      
+      
+      
+      
       private void checkY(){
-        if(goingLeft && checkForWall(sx+1,sy)){
+        if(goingLeft && checkForWall(sx+1,sy) || checkForWall(sx-1,sy)){
           
             if(!checkForWall(sx,sy-1)){
                sy--;  
+            }else{
+                if(checkForWall(sx+1,sy)){
+                    sx--;
+                }else{
+                    sx++;
+                }
             }
             
         }else{
@@ -149,21 +211,31 @@ public class Controller implements ActionListener{
                 if(checkForWall(sx,sy+1) && checkForWall(sx+1,sy)){
                sy--;  
                goingLeft = true;
+               System.out.println("200 goingLeft = "+ goingLeft );
                 }else{
                 goingLeft = false;
+                System.out.println("200 goingLeft = "+ goingLeft );
                 }
            } 
        }// end go right
        
        
-       
+           ////////////////////////////////////////////////////////////////////////////////  
+    ////////////////////////////////////////////////////////////////////////  
+   ////////////////////////////////////////////////////////////////////////////////   
        
        // go left
        if(sy > ey){
-           if(!checkForWall(sx,sy-1)){
+              if(!checkForWall(sx,sy-1)){
                sy--;  
-           }
-         
+           }else{
+                if(checkForWall(sx,sy-1) && checkForWall(sx+1,sy)){
+               sx--;  
+               goingDown = true;
+                }else{
+                goingDown = false;
+                }
+           } 
        }
        
        
@@ -172,6 +244,13 @@ public class Controller implements ActionListener{
         }// end if else
          
       }  // end check y
+      
+      
+      
+    ////////////////////////////////////////////////////////////////////////////////  
+    ////////////////////////////////////////////////////////////////////////  
+   ////////////////////////////////////////////////////////////////////////////////   
+      
       
       
    private void nextStep(int a, int b){
@@ -194,7 +273,7 @@ public class Controller implements ActionListener{
                 smooth(nextSmoothPoint);
             }
             
-            setStart(3,3);
+            setStart(startx,starty);
             if(smoothPoints.size()>0){
                  setEnd(smoothPoints.get(0).j,smoothPoints.get(0).g);
             }
@@ -242,7 +321,7 @@ public class Controller implements ActionListener{
                                    // path.clear();
                                 }else{
                                   setStart(smoothPoints.get(0).j,smoothPoints.get(0).g); 
-                                  setEnd(panel.size-start,panel.size - start);
+                                  setEnd(endx, endy);
                                     smoothPoints.remove(0);
                                    // path.clear();
                                 } 
