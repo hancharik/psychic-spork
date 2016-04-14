@@ -7,8 +7,11 @@ package searchgrid;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Queue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
 import javax.swing.Timer;
 
@@ -192,7 +195,10 @@ public class Controller implements ActionListener{
             }
             
             setStart(3,3);
-        setEnd(smoothPoints.get(0).j,smoothPoints.get(0).g);
+            if(smoothPoints.size()>0){
+                 setEnd(smoothPoints.get(0).j,smoothPoints.get(0).g);
+            }
+     
             lenny = false;
             path.clear();
             }
@@ -205,7 +211,7 @@ public class Controller implements ActionListener{
        
           String ekename = "images/bigskull.gif"; 
         ImageIcon onkeyPic = new ImageIcon(ekename);
-        panel.main.zeke.setIcon(onkeyPic);
+        //panel.main.zeke.setIcon(onkeyPic);
         //smoothPoints.get(0);
           
         // System.out.println("there are " + smoothPoints.size() + " smooth points");  
@@ -265,7 +271,7 @@ public class Controller implements ActionListener{
              for(int i = 0; i < path.size(); i++){
            
          
-           if(i%2==0){
+           if(i < 1000){
                  panel.grid[ path.get(i).j][ path.get(i).g].setBackground(java.awt.Color.green);
                     panel.grid[ path.get(i).j][ path.get(i).g].setForeground(java.awt.Color.green); 
            }else{
@@ -300,6 +306,66 @@ public class Controller implements ActionListener{
       
       
   } 
+  
+    private boolean checkUpOpens(int a, int b) {  //  b would be the real Y + 1. so you check the three above you
+
+        for (int i = -1; i < 1; i++) {
+
+            if (!checkForWall(a  + i, b)) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+    
+    
+    private boolean checkDownOpens(int a, int b) {  //  b would be the real Y - 1. so you check the three below you
+
+        for (int i = -1; i < 1; i++) {
+
+            if (!checkForWall(a + i, b)) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+    
+    
+    private boolean checkLeftOpens(int a, int b) { //  b would be the real X - 1. so you check the three left of you
+
+        for (int i = -1; i < 1; i++) {
+
+            if (!checkForWall(a, b + i)) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+    
+    
+    private boolean checkRightOpens(int a, int b) {//  b would be the real X + 1. so you check the three left of you
+
+        for (int i = -1; i < 1; i++) {
+
+            if (!checkForWall(a, b + i)) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+  
+  
+  
+  
+  
    
   private void createWalls(){
       /*
@@ -398,8 +464,9 @@ public class Controller implements ActionListener{
         }
 
         panel.main.start.addActionListener(this);
+        panel.main.save.addActionListener(this);
         panel.main.zeke.addActionListener(this);
-        
+        panel.main.bfirstButton.addActionListener(this);
     }
 
   
@@ -480,13 +547,38 @@ public class Controller implements ActionListener{
                  }
                  
                  
-                 
+                
                  
                }
        
+         if (e.getSource() ==  panel.main. bfirstButton){
       
+               panel.main. bfirstButton.setText("not yet!");
+            
+               }
        
-       
+              
+         if (e.getSource() ==  panel.main.save){
+             
+              if(panel.main.save.getText().equals("save map")){
+                    panel.main.textArea.setVisible(true);
+               panel.main.save.setText("save");
+                 
+                 }else{
+                        panel.main.textArea.setVisible(false);
+               panel.main.save.setText("save map");
+              // System.out.println("print text = " + panel.main.textArea.getText()+".txt");
+                panel.writeMap("maps/"+panel.main.textArea.getText()+".txt");
+                  try {
+                      panel.main.makeFileArray();
+                  } catch (FileNotFoundException ex) {
+                      Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+                  }
+                 }
+              
+              
+            
+               }
        
        
         for (int i = 0; i < panel.size; i++) {
@@ -498,11 +590,11 @@ public class Controller implements ActionListener{
                     if (panel.grid[i][j].getBackground().equals(java.awt.Color.white)) {
                         panel.grid[i][j].setBackground(java.awt.Color.black);
                         panel.map[i][j]=1;
-                        panel.writeMap();
+                        panel.writeMap("maps/testmap.txt");
                     } else {
                         panel.grid[i][j].setBackground(java.awt.Color.white);
                          panel.map[i][j]=0;
-                         panel.writeMap();
+                         panel.writeMap("maps/testmap.txt");
                     }
 
                     //System.out.println("position = [" + i + "][" + j + "]");

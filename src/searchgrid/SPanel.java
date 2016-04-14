@@ -9,6 +9,7 @@ import com.sun.prism.paint.Color;
 import java.awt.GridLayout;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import javax.swing.JButton;
@@ -116,12 +117,28 @@ private int[][] drawMap(){
     return temp;
 }// end draw map
 
-public int[][] writeMap(){
+
+/*
+File thisFile = new File("score.txt");
+if(!thisFile.exists()) {
+    thisFile.createNewFile();
+} 
+FileOutputStream oFile = new FileOutputStream(thisFile, false); 
+
+*/
+
+
+
+public int[][] writeMap(String s){
     int[][] temp = new int[size][size];
     try {
-			
+			File thisFile = new File(s);
+                        if(!thisFile.exists()) {
+                            thisFile.createNewFile();
+                           // System.out.println("new file created: " + s);
+                        } 
 			//BufferedWriter br = new BufferedWriter(new FileReader("maps/testmap.txt"));
-			FileWriter fw = new FileWriter("maps/testmap.txt");
+			FileWriter fw = new FileWriter(thisFile);
 			BufferedWriter bw = new BufferedWriter(fw);
 		
 		   bw.write(""+size+"\n");
