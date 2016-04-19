@@ -7,19 +7,20 @@ package searchgrid;
 
 
 import java.awt.BorderLayout;
+import java.io.FileNotFoundException;
 import javax.swing.*;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 
 public class SFrame extends JFrame{
     
     //SPanel panel = new SPanel();
-    MainPanel main = new MainPanel();
-    public SFrame(){
+    MainPanel main;// = new MainPanel();
+    public SFrame() throws FileNotFoundException{
         
-    
+   
         
-        super("ZStar search algorithm - written at Shingletown Gap 04/12/16");
-        
+        super("PathFinding Visualizer");//"ZStar search algorithm - written at Shingletown Gap 04/12/16"
+         main = new MainPanel();
        setLayout(new BorderLayout());
         getContentPane().add(main);
         

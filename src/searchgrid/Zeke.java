@@ -19,11 +19,16 @@ import javax.swing.Timer;
  *
  * @author markhancharik
  */
-public class Controller implements ActionListener {
+public class Zeke implements ActionListener {
 
     SPanel panel;
     Timer timer;
 
+    boolean green = false;
+    boolean red = false;
+    
+    
+    
     int startx;// = panel.size-3;
     int starty;// = 3;
     int endx;// = 3;
@@ -51,9 +56,10 @@ public class Controller implements ActionListener {
 
     int counter = 0;
     
-    
+    Graph graph;
 
-    public Controller(SPanel s) throws FileNotFoundException {
+    
+    public Zeke(SPanel s) throws FileNotFoundException {
 
         panel = s;
         
@@ -103,7 +109,7 @@ public class Controller implements ActionListener {
             } else {
                 String zekename = "images/zeke.gif";
                 ImageIcon monkeyPic = new ImageIcon(zekename);
-                //panel.grid[ path.get(i).x][ path.get(i).g].setIcon(monkeyPic);
+                //panel.grid[ path.get(i).j][ path.get(i).g].setIcon(monkeyPic);
                 String kenam = "images/bigzeke.gif";
                 ImageIcon onkyPic = new ImageIcon(kenam);
                 // panel.main.zeke.setIcon(onkyPic);
@@ -344,15 +350,37 @@ System.out.println("hooking up buttons");
 
                 if (e.getSource() == panel.grid[i][j]) {
 
+                    
+                    if(green){
+                      startx = i;
+                     starty = j;
+                     panel.grid[i][j].setBackground(java.awt.Color.green);
+                     green = false;
+                    }
+                    if(red){
+                       endx = i;
+                        endy = j;
+                        panel.grid[i][j].setBackground(java.awt.Color.red);
+                        red = false;
+                    }
+                    
+                    
+                    
                     if (panel.grid[i][j].getBackground().equals(java.awt.Color.white)) {
                         addWall(i,j);//panel.grid[i][j].setBackground(java.awt.Color.black);
                         panel.map[i][j] = 1;
                         // we were having problems with move this to a save button
-                       panel.writeMap(panel.currentMap);
-                    } else {
+                       // panel.writeMap(panel.currentMap);
+                    } else if (panel.grid[i][j].getBackground().equals(java.awt.Color.green)) {
+                        green = true;
+                        panel.grid[i][j].setBackground(java.awt.Color.white);
+                    }  else if  (panel.grid[i][j].getBackground().equals(java.awt.Color.red)) {
+                        red = true;
+                        panel.grid[i][j].setBackground(java.awt.Color.white);
+                    } else{
                         clearWall(i,j);//panel.grid[i][j].setBackground(java.awt.Color.white);
                         panel.map[i][j] = 0;
-                       panel.writeMap(panel.currentMap);
+                       // panel.writeMap(panel.currentMap);
                     }
 
                     //System.out.println("position = [" + i + "][" + j + "]");
@@ -385,39 +413,29 @@ System.out.println("hooking up buttons");
     ////////////////////////////////////////////////////////////////////////////////   
     private void checkX() {
 
-        
-        if(goingUp){
-            
-        }else{
-        
         if (goingDown && checkForWall(sx, sy + 1) || checkForWall(sx, sy - 1)) {
             if (!checkForWall(sx - 1, sy)) {
-             //   sx--;
+                sx--;
             } else {
                 if (checkForWall(sx, sy + 1)) {
-                //    sy--;
+                    sy--;
                 } else {
-                 //   sy++;
+                    sy++;
                 }
             }
         } else {
-            
-            
-           
-            
-            
             // go down
             if (sx < ex) {
                 if (!checkForWall(sx + 1, sy)) {
                     sx++;
                     //goingLeft = true;  
                 } else {
-                   // goingLeft = true;
+                    goingLeft = true;
                 }
 
                 // special condition for when there is a wall below you and the taget is directly beneath you, otherwise you will stop moving
                 if (checkForWall(sx + 1, sy) && sy == ey) {
-                  //  goingLeft = true;
+                    goingLeft = true;
                 }
 
             }  // end go down
@@ -438,70 +456,38 @@ System.out.println("hooking up buttons");
             }
 
         }
-        
-        }
     } // end check x
 
          ////////////////////////////////////////////////////////////////////////////////  
     ////////////////////////////////////////////////////////////////////////  
     ////////////////////////////////////////////////////////////////////////////////    
     private void checkY() {
-        /*
-    }
         if (goingLeft && checkForWall(sx + 1, sy) || checkForWall(sx - 1, sy)) {
 
             if (!checkForWall(sx, sy - 1)) {
-             //   sy--;
+                sy--;
             } else {
                 if (checkForWall(sx + 1, sy)) {
-                 //   sx--;
+                    sx--;
                 } else {
-                 //   sx++;
+                    sx++;
                 }
             }
 
         } else {
-*/
+
             // go right   
             if (sy < ey) {
-                
-                
-                if(goingLeft && !checkForWall(sx -1, sy)){
-                    
-                }
-                
-                
-                
-                if (!checkForWall(sx, sy + 1) && !goingLeft) {
+                if (!checkForWall(sx, sy + 1)) {
                     sy++;
-                    goingUp = false;
-                    goingLeft = false;
                 } else {
-                    sy--;
-                    // we want to go right, but we hit a wall,
-                    // so first, let's try to go in the direction of the target
-                  
-                         if ( sx < ex && !checkForWall(sx + 1, sy) && !goingUp) {
-                       // sx++;
-                        //goingLeft = true;
-                       // System.out.println("200 goingLeft = " + goingLeft);
-                    } else if ( sx < ex && !checkForWall(sx - 1, sy) ) {
-                       // sx--;
-                        goingUp = true;
-                         if(goingLeft && !checkForWall(sx -1, sy)){
-                     goingLeft = false;
-                        }
-                       
-                       // System.out.println("200 goingLeft = " + goingLeft);
+                    if (checkForWall(sx, sy + 1) && checkForWall(sx + 1, sy)) {
+                        sy--;
+                        goingLeft = true;
+                        System.out.println("200 goingLeft = " + goingLeft);
                     } else {
-                        if(!checkForWall(sx, sy - 1)){
-                               sy--;
-                        goingLeft = true; 
-                        }else{
-                            
-                        }
-                    
-                    //  System.out.println("469 TRAPPED!!!!   help me! help me! help me!!!! sx = " +sx + " ex = " + ex );  
+                        goingLeft = false;
+                        System.out.println("200 goingLeft = " + goingLeft);
                     }
                 }
             }// end go right
@@ -523,7 +509,7 @@ System.out.println("hooking up buttons");
                 }
             }
 
-       // }// end if else
+        }// end if else
 
     }  // end check y
 
@@ -547,8 +533,6 @@ System.out.println("hooking up buttons");
             if (nextSmoothPoint != 0) {
                 smooth(nextSmoothPoint);
             }
-                
-          
 
             setStart(startx, starty);
             if (smoothPoints.size() > 0) {
@@ -589,7 +573,6 @@ System.out.println("hooking up buttons");
                     // path.clear();
                 } else {
                     setStart(smoothPoints.get(0).x, smoothPoints.get(0).y);
-                    setEnd(endx, endy);
                     smoothPoints.remove(0);
                     // path.clear();
                 }
@@ -614,7 +597,7 @@ System.out.println("hooking up buttons");
         nextSmoothPoint = 0;
 
         for (int i = start + 1; i < path.size(); i++) {
-            // System.out.println("\nSMOOTHING...  step #"+ i  + ", " + getDistance(path.get(start).x,path.get(i).x, path.get(start).g,path.get(i).g));
+            // System.out.println("\nSMOOTHING...  step #"+ i  + ", " + getDistance(path.get(start).j,path.get(i).j, path.get(start).g,path.get(i).g));
             if (getDistance(path.get(start).x, path.get(i).x, path.get(start).y, path.get(i).y) < getDistance(path.get(start).x, path.get(i - 1).x, path.get(start).y, path.get(i - 1).y)) {
                 panel.grid[path.get(i).x][path.get(i).y].setBackground(java.awt.Color.MAGENTA);
                 gettingSmaller = true;
@@ -622,9 +605,8 @@ System.out.println("hooking up buttons");
 
                 if (gettingSmaller) {
                     smoothPoints.add(path.get(i - 1));
-                    //   System.out.println("there are " + smoothPoints.size() + " smooth points");//System.out.println("\n\n\n this is a SUUUUUUPER POINT!!!!!!!!!!!!   [" + path.get(i-1).x+ "][" + path.get(i-1).g + "]\n\n\n");
+                    //   System.out.println("there are " + smoothPoints.size() + " smooth points");//System.out.println("\n\n\n this is a SUUUUUUPER POINT!!!!!!!!!!!!   [" + path.get(i-1).j+ "][" + path.get(i-1).g + "]\n\n\n");
                     nextSmoothPoint = i - 1;
-                    System.out.println("there are " + smoothPoints.size() + " smooth points. Next smooth point = " + nextSmoothPoint);
                     gettingSmaller = false;
                     return;
                 }

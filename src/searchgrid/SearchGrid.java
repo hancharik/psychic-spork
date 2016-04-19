@@ -5,17 +5,17 @@
  */
 package searchgrid;
 
+import java.io.FileNotFoundException;
+
 /**
  *
  * @author markhancharik
  */
 public class SearchGrid {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-       SFrame f = new SFrame();
+    static SFrame f;
+    public static void main(String[] args) throws FileNotFoundException {
+        f = new SFrame();
     }
     
 }

@@ -15,16 +15,19 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JTextArea;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
 /**
  *
  * @author mark
  */
-public class MainPanel extends JPanel{
+public class MainPanel extends JPanel implements ChangeListener{
     
-    SPanel gameBoard;;// = new SPanel(this);
+    SPanel gameBoard;// = new SPanel(this);
  
  JLabel label;// = new JLabel("finding path..."); 
  JButton start;// = new JButton("start");
@@ -35,7 +38,10 @@ public class MainPanel extends JPanel{
  
  JPanel mapButtonPanel;
  
- ArrayList<JButton> mapButtons = new ArrayList();
+ JSlider sliderOfHueristic;
+  JLabel labelOfHueristic;
+ 
+ ArrayList<JButton> mapButtons;// = new ArrayList();
  ArrayList<String> maps = new ArrayList();
  
                  int from;// = line1.indexOf("h");
@@ -43,11 +49,8 @@ public class MainPanel extends JPanel{
                  int from2;// = line1.indexOf("f");
                  int to2;// = line1.lastIndexOf("\t");
                   String line1;
-                 /* HungryLikeTheWolf:    "wereWolf.Wolf";////"lee0814.Wolf";//"ribau.Wolf";//
-                    I ate granny: //"joe.Wolf";//"vella.Wolf";//"thesnake.Wolf";//
-                 */
-                 
-                 String line2 = ".txt";//"zeke.Wolf";//"rickyBobby.Wolf";//"hancharik.Wolf";//
+                
+                 String line2 = ".txt";
                  String line3 = line2.substring(0);
  
  
@@ -61,17 +64,22 @@ public class MainPanel extends JPanel{
  
  
  
-    public MainPanel(){
+    public MainPanel() throws FileNotFoundException{
     
         super();
         
         setLayout(null);
         
-        
+        mapButtons = new ArrayList();
+         makeFileArray();
+           mapButtonPanel = categoryPanel();
+        mapButtonPanel.setBounds(840,20,120,400);
+        mapButtonPanel.setBackground(Color.yellow);
+        //add(mapButtonPanel);
         label = new JLabel("finding path..."); 
-        start = new JButton("pause");
+        start = new JButton("start");
          save = new JButton("save map");
-        zeke = new JButton("z star");
+        zeke = new JButton("smoothing demo");
         bfirstButton = new JButton("breadth-first");
         textArea = new JTextArea();
         gameBoard = new SPanel(this);
@@ -84,12 +92,24 @@ public class MainPanel extends JPanel{
         save.setBounds(720,860,120,40);
         textArea.setBounds(720,810,120,30);
         textArea.setVisible(false);
-        zeke.setBounds(840,520, 120,40);
-        bfirstButton.setBounds(840,580, 120,40);
+        zeke.setBounds(820,520, 160,40);
+        bfirstButton.setBounds(820,580, 160,40);
         String zekename = "images/bigzeke2.gif"; 
         ImageIcon monkeyPic = new ImageIcon(zekename);
         //zeke.setIcon(monkeyPic);
        // zeke.addActionListener(this);  // moved to controller class
+       
+    
+    sliderOfHueristic = new JSlider(JSlider.HORIZONTAL, 0, 100, 6);
+   // sliderOfHueristic.setBackground(monkeyPanel.randomColor(monkeyPanel.theme));
+    sliderOfHueristic.addChangeListener(this);
+    labelOfHueristic = new JLabel("<html><h2><font color='black'>Hueristic: </font><font color='red'>" + gameBoard.controller.hMultiplier + "</font><h2></html>");
+       sliderOfHueristic.setBounds(300,880, 300,40);
+        labelOfHueristic.setBounds(120,880, 160,40);
+       
+       add(sliderOfHueristic);
+        add(labelOfHueristic);
+       
         add(zeke);
         add(bfirstButton);
         
@@ -114,7 +134,7 @@ public class MainPanel extends JPanel{
   
   public void makeFileArray() throws FileNotFoundException{
        
-       
+       mapButtons.clear();
                // Construct Scanner objects for input files
     
         ArrayList<String> fileNames = new ArrayList();
@@ -172,17 +192,14 @@ public class MainPanel extends JPanel{
 
         in1.close();
         if(numbers.size()>0){
-          System.out.println("score/time: " + (int)(numbers.get(0) / numbers.get(1)));  
+         // System.out.println("score/time: " + (int)(numbers.get(0) / numbers.get(1)));  
         }
    
    numbers.clear();
     }
         //out.close();
        
-       mapButtonPanel = categoryPanel();
-        mapButtonPanel.setBounds(840,20,120,400);
-        mapButtonPanel.setBackground(Color.yellow);
-        add(mapButtonPanel);
+     
        
        
    } 
@@ -214,8 +231,8 @@ public class MainPanel extends JPanel{
     
     
     
-    private JPanel categoryPanel() {
-
+    public JPanel categoryPanel() {
+        mapButtons.clear();
         JPanel mercPanel = new JPanel();
         int buttons = maps.size();
         int rows = 10;
@@ -246,11 +263,28 @@ public class MainPanel extends JPanel{
 
             // jimmy.addActionListener(this);
             mapButtons.add(jimmy);
+            System.out.println("adding to jimmy");
             mercPanel.add(jimmy);
 
         }
         return mercPanel;
     }  // end cat panel
+
+    
+    
+    
+    
+    @Override
+    public void stateChanged(ChangeEvent ce) {
+       JSlider source = (JSlider)ce.getSource();
+       
+        if (source == sliderOfHueristic) {
+            gameBoard.controller.hMultiplier = source.getValue();
+            labelOfHueristic.setText("<html><h2><font color='black'>Hueristic: </font><font color='red'>" + gameBoard.controller.hMultiplier + "</font><h2></html>");
+            //monkeyPanel.trustTheMonkeysLabel.setText("<html><h2><font color='black'>Merchants: </font><font color='red'>" + valueReturned + "</font><h2></html>");
+          //  monkeyPanel.startButton.setVisible(true);
+        }
+    }
 
     
     

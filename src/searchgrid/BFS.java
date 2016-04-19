@@ -19,11 +19,15 @@ import javax.swing.Timer;
  *
  * @author markhancharik
  */
-public class Controller implements ActionListener {
+public class BFS implements ActionListener {
 
     SPanel panel;
     Timer timer;
 
+    
+    
+    
+    
     int startx;// = panel.size-3;
     int starty;// = 3;
     int endx;// = 3;
@@ -45,19 +49,30 @@ public class Controller implements ActionListener {
     ArrayList<Block> path = new ArrayList();
     ArrayList<Block> smoothPoints = new ArrayList();
 
+    ArrayList<Block> open = new ArrayList();
+    ArrayList<Block> closed = new ArrayList();
+    
+    
+    
     int nextSmoothPoint = 0;
 
     boolean lenny = true; // otherwise, squiggy... lenny finds a path, squiggy smooths the path
-
+    boolean pathBuilt = false;
+    boolean pathReady = false;
+    boolean nextStep2 = false;
     int counter = 0;
     
     
+    Graph graph;
+    
+    double hMultiplier = 6.0;
+    int finalPathSize; // this is to store the length of the path, to compare unsmoothed vs smoothed path lengths
 
-    public Controller(SPanel s) throws FileNotFoundException {
+    public BFS(SPanel s) throws FileNotFoundException {
 
         panel = s;
         
-        timer = new Timer(100, this);
+        timer = new Timer(60, this);
         setup();
 
     }
@@ -73,8 +88,8 @@ public class Controller implements ActionListener {
         //createWalls();
         hookUpButtons();
         panel.main.makeFileArray();
-        
-        timer.start();
+        graph = new Graph(this);
+       // timer.start();
         // System.out.println("there are " + smoothPoints.size() + " smooth points");
     }
 
@@ -83,6 +98,7 @@ public class Controller implements ActionListener {
         panel.grid[a][b].setForeground(java.awt.Color.black);
         sx = a;
         sy = b;
+        
         path.add(new Block(a, b));
     }
 
@@ -95,9 +111,14 @@ public class Controller implements ActionListener {
 
    public void colorPath() {
 
+      
+        
+        
+        // we should probably throw this into a stack soon...
+       
         for (int i = 0; i < path.size(); i++) {
 
-            if (i < 1000) {
+            if (i <  path.size()) {
                 panel.grid[path.get(i).x][path.get(i).y].setBackground(java.awt.Color.green);
                 panel.grid[path.get(i).x][path.get(i).y].setForeground(java.awt.Color.green);
             } else {
@@ -117,69 +138,6 @@ public class Controller implements ActionListener {
     }
 
 
-    private void createWalls() {
-        /*
-      
-         these are the original walls, leaving them here for reference.  
-      
-      
-         addWall(10,10);
-         addWall(11,10);
-         addWall(12,10);
-         addWall(13,10);
-         addWall(14,10);
-      
-      
-         addWall(14,5);
-         addWall(14,6);
-         addWall(14,7);
-         addWall(14,8);
-         addWall(14,9);
-      
-      
-         addWall(19,4);
-         addWall(19,5);
-         addWall(19,6);
-         // addWall(19,7);
-         //  addWall(19,8);
-         // addWall(19,9);
-      
-         //addWall(18,10);
-         // addWall(18,10);
-         // addWall(18,10);
-         // addWall(18,10);
-     
-     
-         addWall(23,20);
-         addWall(24,20);
-         addWall(25,20);
-         addWall(26,20);
-         addWall(27,20);
-      
-         addWall(28,6);
-         addWall(29,6);
-         addWall(30,6);
-         addWall(31,6);
-         addWall(32,6);
-         addWall(33,6);
-      
-         addWall(28,7);
-         addWall(28,8);
-         addWall(28,9);
-         addWall(28,10);
-         addWall(28,11);
-         addWall(28,12);
-         addWall(28,13);
-         addWall(28,14);
-         addWall(28,15);
-         addWall(28,16);
-         addWall(28,17);
-         addWall(28,18);
-         addWall(28,19);
-         addWall(28,20);
-      
-         */
-    }
 
     private void printPath() {
 
@@ -240,7 +198,7 @@ System.out.println("hooking up buttons");
                 
                  panel.colorButtons();
                  lenny = true;
-                  panel.main.start.setText("pause");
+                  panel.main.start.setText("start");
                 setup();//panel.main.runSearch();
         
         
@@ -254,13 +212,34 @@ System.out.println("hooking up buttons");
     public void actionPerformed(ActionEvent e) {
 
         if (e.getSource() == timer) {
-            counter++;
-
-            if (lenny) {
-                nextStep(sx, sy);
-            } else {
-                nextStep2(sx, sy);
+            if(lenny){
+                graph.start.addNeighborsToOpenList();
+                lenny = false;
+            }else if(!graph.endFound){
+                graph.sortNodesByValue().addNeighborsToOpenList();
+            }else if(!pathBuilt){
+                graph.buildPath();
+                pathBuilt = true;
+            }else if(!pathReady){
+                 graph.colorPath();
+            }else if(!nextStep2){
+               //  nextStep(sx, sy);
+            }else{
+                
+               //  nextStep2(sx, sy);
+               //graph.colorPath();
             }
+            if(timer.isRunning()){
+              panel.main.label.setText("step: " + counter);
+            counter++;  
+            }
+          
+
+            //if (lenny) {
+           //     nextStep(sx, sy);
+           // } else {
+           //     nextStep2(sx, sy);
+          //  }
 
         }
 
@@ -385,145 +364,41 @@ System.out.println("hooking up buttons");
     ////////////////////////////////////////////////////////////////////////////////   
     private void checkX() {
 
-        
-        if(goingUp){
-            
-        }else{
-        
-        if (goingDown && checkForWall(sx, sy + 1) || checkForWall(sx, sy - 1)) {
-            if (!checkForWall(sx - 1, sy)) {
-             //   sx--;
-            } else {
-                if (checkForWall(sx, sy + 1)) {
-                //    sy--;
-                } else {
-                 //   sy++;
-                }
-            }
-        } else {
-            
-            
+      
            
-            
-            
             // go down
             if (sx < ex) {
-                if (!checkForWall(sx + 1, sy)) {
-                    sx++;
-                    //goingLeft = true;  
-                } else {
-                   // goingLeft = true;
-                }
-
-                // special condition for when there is a wall below you and the taget is directly beneath you, otherwise you will stop moving
-                if (checkForWall(sx + 1, sy) && sy == ey) {
-                  //  goingLeft = true;
-                }
-
-            }  // end go down
-
-             ////////////////////////////////////////////////////////////////////////////////  
-            ////////////////////////////////////////////////////////////////////////  
-            ////////////////////////////////////////////////////////////////////////////////      
-            // go up    
-            if (sx > ex) {
-                if (!checkForWall(sx - 1, sy)) {
-                    sx--;
-                }
-            }  // end go up
-
-            // special condition for when there is a wall below you and the taget is directly beneath you, otherwise you will stop moving
-            if (checkForWall(sx - 1, sy) && sy == ey) {
-                goingLeft = true;
+            if(!checkForWall(sx + 1, sy)){
+               sx++;   
             }
+                  
+                   
+                } else {
+                     if(!checkForWall(sx - 1, sy)){
+               sx--;   
+            }
+                }
 
-        }
-        
-        }
+                
     } // end check x
 
          ////////////////////////////////////////////////////////////////////////////////  
     ////////////////////////////////////////////////////////////////////////  
     ////////////////////////////////////////////////////////////////////////////////    
     private void checkY() {
-        /*
-    }
-        if (goingLeft && checkForWall(sx + 1, sy) || checkForWall(sx - 1, sy)) {
-
-            if (!checkForWall(sx, sy - 1)) {
-             //   sy--;
-            } else {
-                if (checkForWall(sx + 1, sy)) {
-                 //   sx--;
-                } else {
-                 //   sx++;
-                }
-            }
-
-        } else {
-*/
-            // go right   
+ 
             if (sy < ey) {
                 
-                
-                if(goingLeft && !checkForWall(sx -1, sy)){
-                    
-                }
-                
-                
-                
-                if (!checkForWall(sx, sy + 1) && !goingLeft) {
-                    sy++;
-                    goingUp = false;
-                    goingLeft = false;
-                } else {
-                    sy--;
-                    // we want to go right, but we hit a wall,
-                    // so first, let's try to go in the direction of the target
-                  
-                         if ( sx < ex && !checkForWall(sx + 1, sy) && !goingUp) {
-                       // sx++;
-                        //goingLeft = true;
-                       // System.out.println("200 goingLeft = " + goingLeft);
-                    } else if ( sx < ex && !checkForWall(sx - 1, sy) ) {
-                       // sx--;
-                        goingUp = true;
-                         if(goingLeft && !checkForWall(sx -1, sy)){
-                     goingLeft = false;
-                        }
-                       
-                       // System.out.println("200 goingLeft = " + goingLeft);
-                    } else {
-                        if(!checkForWall(sx, sy - 1)){
-                               sy--;
-                        goingLeft = true; 
-                        }else{
-                            
-                        }
-                    
-                    //  System.out.println("469 TRAPPED!!!!   help me! help me! help me!!!! sx = " +sx + " ex = " + ex );  
-                    }
-                }
-            }// end go right
-
-           ////////////////////////////////////////////////////////////////////////////////  
-            ////////////////////////////////////////////////////////////////////////  
-            ////////////////////////////////////////////////////////////////////////////////   
-            // go left
-            if (sy > ey) {
-                if (!checkForWall(sx, sy - 1)) {
-                    sy--;
-                } else {
-                    if (checkForWall(sx, sy - 1) && checkForWall(sx + 1, sy)) {
-                        sx--;
-                        goingDown = true;
-                    } else {
-                        goingDown = false;
-                    }
-                }
+                 if(!checkForWall(sx, sy + 1)){
+               sy++;   
             }
-
-       // }// end if else
+          
+                } else {
+                         if(!checkForWall(sx, sy - 1)){
+               sy--;   
+            }
+               
+            }
 
     }  // end check y
 
@@ -535,6 +410,10 @@ System.out.println("hooking up buttons");
         checkX();
         checkY();
 
+        
+        
+        
+        
         panel.grid[sx][sy].setBackground(java.awt.Color.blue);
         panel.grid[sx][sy].setForeground(java.awt.Color.blue);
         path.add(new Block(sx, sy));
@@ -555,7 +434,7 @@ System.out.println("hooking up buttons");
                 setEnd(smoothPoints.get(0).x, smoothPoints.get(0).y);
             }
 
-            lenny = false;
+            nextStep2 = true;
             path.clear();
         }
 

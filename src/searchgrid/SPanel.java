@@ -10,8 +10,11 @@ import java.awt.GridLayout;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
@@ -24,18 +27,25 @@ public class SPanel extends JPanel{
     int size = 40;
     int[][] map = new int[size][size];
     JButton[][] grid = new JButton[size][size];
-    Controller controller;
+    //Zeke controller;
+    BFS controller;
     MainPanel main;
-    
+    String currentMap;// = "maps/testmap.txt";
     
     public SPanel(MainPanel m){
         
         super();
         main = m;
         setLayout(new GridLayout(size,size));
+        currentMap = "maps/testmap.txt";
         map = drawMap();
         addButtons();
-        controller = new Controller(this);
+        try {
+           controller = new BFS(this);//controller = new Zeke(this);// 
+             
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(SPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }  // end constructor
     
     
@@ -47,29 +57,7 @@ public class SPanel extends JPanel{
          for(int j = 0; j < size; j++){
 ////           
           grid[i][j] = new JButton();//i + "" + j);
-          /*
-          if(i%2 == 0 && j%2 == 0){
-            grid[i][j].setBackground(java.awt.Color.black);
-             grid[i][j].setForeground(java.awt.Color.white); 
-          }else if(i%2 == 1 && j%2 == 1){
-            grid[i][j].setBackground(java.awt.Color.black);
-             grid[i][j].setForeground(java.awt.Color.white); 
-          }else{
-             grid[i][j].setBackground(java.awt.Color.white);
-             grid[i][j].setForeground(java.awt.Color.black);   
-          }
-            
-           */
-              if(map[i][j]==0){
-                 grid[i][j].setBackground(java.awt.Color.white);
-                 grid[i][j].setForeground(java.awt.Color.black);   
-              }   else{
-                   grid[i][j].setBackground(java.awt.Color.black);
-                    grid[i][j].setForeground(java.awt.Color.white);  
-              }   
-            // grid[i][j].setBackground(java.awt.Color.white);
-            // grid[i][j].setForeground(java.awt.Color.black); 
-             
+   
             grid[i][j].setBorderPainted(false);
            
             grid[i][j].setOpaque(true);
@@ -82,16 +70,46 @@ public class SPanel extends JPanel{
        }
        
        
-       
+       colorButtons();
        
    }  // end add buttons 
-    
+
+   
+   
+  public void colorButtons(){
+       
+       
+             for(int i = 0; i < size; i++){
+////           
+         for(int j = 0; j < size; j++){
+////           
+
+              if(map[i][j]==0){
+                 grid[i][j].setBackground(java.awt.Color.white);
+                 grid[i][j].setForeground(java.awt.Color.black);   
+              }   else{
+                   grid[i][j].setBackground(java.awt.Color.black);
+                    grid[i][j].setForeground(java.awt.Color.white);  
+              }   
  
-private int[][] drawMap(){
+             
+         
+          
+     
+           
+       }
+           
+       }
+       
+       
+       
+   }
+ 
+public int[][] drawMap(){
     int[][] temp = new int[size][size];
     try {
 			
-			BufferedReader br = new BufferedReader(new FileReader("maps/testmap.txt"));
+			BufferedReader br = new BufferedReader(new FileReader(currentMap));
 			
 			int mapWidth = Integer.parseInt(br.readLine());
 			int mapHeight = Integer.parseInt(br.readLine());
@@ -118,18 +136,11 @@ private int[][] drawMap(){
 }// end draw map
 
 
-/*
-File thisFile = new File("score.txt");
-if(!thisFile.exists()) {
-    thisFile.createNewFile();
-} 
-FileOutputStream oFile = new FileOutputStream(thisFile, false); 
-
-*/
 
 
 
-public int[][] writeMap(String s){
+
+public void writeMap(String s){
     int[][] temp = new int[size][size];
     try {
 			File thisFile = new File(s);
@@ -156,7 +167,7 @@ public int[][] writeMap(String s){
     
     
     
-    return temp;
+   // return temp;
 }// end draw map
    
     
