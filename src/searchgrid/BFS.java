@@ -43,7 +43,16 @@ public class BFS implements ActionListener {
     boolean goingDown;
 
     boolean clockwise;
+    
+    
+    // these are for adding gaps in the path - safeCorners reduces distance to one around corners, 
+    //  modHolder adjusts the period of skips (2 is every other one, three is every third)
+    boolean safeCorners = false;
+    int modHolder = 3; // 1%2==modHolder
 
+    
+    
+    
     boolean gettingSmaller = false;
 
     ArrayList<Block> path = new ArrayList();
@@ -61,7 +70,7 @@ public class BFS implements ActionListener {
     boolean pathReady = false;
     boolean nextStep2 = false;
     int counter = 0;
-    
+    int timerSetting = 60;
     
     Graph graph;
     
@@ -72,7 +81,7 @@ public class BFS implements ActionListener {
 
         panel = s;
         
-        timer = new Timer(60, this);
+        timer = new Timer(timerSetting, this);
         setup();
 
     }
@@ -116,23 +125,53 @@ public class BFS implements ActionListener {
         
         // we should probably throw this into a stack soon...
        
-        for (int i = 0; i < path.size(); i++) {
+        for (int i = 1; i < path.size(); i++) {
 
-            if (i <  path.size()) {
-                panel.grid[path.get(i).x][path.get(i).y].setBackground(java.awt.Color.green);
-                panel.grid[path.get(i).x][path.get(i).y].setForeground(java.awt.Color.green);
-            } else {
-                String zekename = "images/zeke.gif";
-                ImageIcon monkeyPic = new ImageIcon(zekename);
-                //panel.grid[ path.get(i).x][ path.get(i).g].setIcon(monkeyPic);
-                String kenam = "images/bigzeke.gif";
-                ImageIcon onkyPic = new ImageIcon(kenam);
-                // panel.main.zeke.setIcon(onkyPic);
+            if (i <  path.size()-2) {
+                // this is to check if the points are in a straight line - NEED TO FIX!! better choice is to check for obstacles if in a corner
+                // i think we can figure out a subtraction problem which produces the correct cell to check for obstacle
+                // until then, this is a quick fix:
+                if(safeCorners){
+                  
+                         if(i%2==modHolder  && ((path.get(i).x == path.get(i+1).x || path.get(i).y == path.get(i+1).y  )&&(path.get(i).x == path.get(i-1).x || path.get(i).y == path.get(i-1).y  ))){
+                     // i'm leaving this here to show myself how I was wrong in my logic, this was the original, which is logically incorrect
+               // if(i%2==0 && path.get(i).x == path.get(i+1).x && path.get(i).y == path.get(i+1).y ){
                 panel.grid[path.get(i).x][path.get(i).y].setBackground(java.awt.Color.white);
                 panel.grid[path.get(i).x][path.get(i).y].setForeground(java.awt.Color.white);
+            } else {
+              
+                panel.grid[path.get(i).x][path.get(i).y].setBackground(java.awt.Color.green);
+                panel.grid[path.get(i).x][path.get(i).y].setForeground(java.awt.Color.green);
+               
 
+            }  // end if/else
+                    
+                    
+                    
+                }else{
+                   
+                    
+                    
+                        if(i%2==modHolder ){
+               panel.grid[path.get(i).x][path.get(i).y].setBackground(java.awt.Color.white);
+                panel.grid[path.get(i).x][path.get(i).y].setForeground(java.awt.Color.white);
+            } else {
+              
+                panel.grid[path.get(i).x][path.get(i).y].setBackground(java.awt.Color.green);
+                panel.grid[path.get(i).x][path.get(i).y].setForeground(java.awt.Color.green);
+               
+
+            }  // end if/else 
+                    
+                    
+                    
+                    
+                    
+                }
+            
+                 
+                 
             }
-
         }
 
     }
@@ -230,8 +269,9 @@ System.out.println("hooking up buttons");
                //graph.colorPath();
             }
             if(timer.isRunning()){
-              panel.main.label.setText("step: " + counter);
+              panel.main.label.setText("<html><h2><font color='black'>step: </font><font color='black'>" + counter + "</font><h2></html>");
             counter++;  
+            timer.setDelay(timerSetting);
             }
           
 
